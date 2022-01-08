@@ -3,4 +3,6 @@
     <attr name="colorPrimary" format="color"/>
     <attr name="colorPrimaryLight" format="color"/>
     <attr name="colorPrimaryDark" format="color"/>
+    <attr name="strokeColor" format="color" />
+
 </resources>

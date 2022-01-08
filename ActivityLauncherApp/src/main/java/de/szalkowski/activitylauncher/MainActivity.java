@@ -9,6 +9,8 @@ import android.view.Menu;
 import android.view.MenuItem;
 import android.widget.Filter;
 import android.widget.Filterable;
+import androidx.appcompat.widget.Toolbar;
+
 import androidx.appcompat.widget.SearchView;
 
 import androidx.annotation.NonNull;
@@ -16,7 +18,9 @@ import androidx.appcompat.app.AppCompatActivity;
 import androidx.fragment.app.DialogFragment;
 import androidx.fragment.app.FragmentActivity;
 
-public class MainActivity extends AppCompatActivity {
+import com.google.android.material.color.DynamicColors;
+
+public class MainActivity extends ActivityLauncher  {
 
     private Filterable filterTarget = null;
 
@@ -24,6 +28,8 @@ public class MainActivity extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
+        Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
+        setSupportActionBar(toolbar);
 
         var prefs = getPreferences(Context.MODE_PRIVATE);
         if (!prefs.getBoolean("disclaimer_accepted", false)) {
@@ -83,26 +89,6 @@ public class MainActivity extends AppCompatActivity {
     public boolean onOptionsItemSelected(MenuItem item) {
         int id = item.getItemId();
 
-        if (id == R.id.action_view_source) {
-            Intent i2 = new Intent(Intent.ACTION_VIEW);
-            i2.setData(Uri.parse(this.getString(R.string.url_source)));
-            this.startActivity(i2);
-            return true;
-        }
-
-        if (id == R.id.action_view_translation) {
-            Intent i3 = new Intent(Intent.ACTION_VIEW);
-            i3.setData(Uri.parse(this.getString(R.string.url_translation)));
-            this.startActivity(i3);
-            return true;
-        }
-
-        if (id == R.id.action_view_bugs) {
-            Intent i4 = new Intent(Intent.ACTION_VIEW);
-            i4.setData(Uri.parse(this.getString(R.string.url_bugs)));
-            this.startActivity(i4);
-            return true;
-        }
 
         return super.onOptionsItemSelected(item);
     }

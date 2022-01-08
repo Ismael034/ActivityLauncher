@@ -1,20 +1,16 @@
 <menu xmlns:android="http://schemas.android.com/apk/res/android"
-    xmlns:app="http://schemas.android.com/apk/res-auto">
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools">
     <item android:id="@+id/search"
         android:title="@string/action_filter"
-        android:icon="@android:drawable/ic_menu_search"
+        android:icon="@drawable/ic_search"
         app:showAsAction="collapseActionView|always"
-        app:actionViewClass="androidx.appcompat.widget.SearchView" />
-    <item
-        android:id="@+id/action_view_source"
-        app:showAsAction="never"
-        android:title="@string/action_view_source" />
-    <item
-        android:id="@+id/action_view_translation"
-        app:showAsAction="never"
-        android:title="@string/action_view_translation" />
-    <item
-        android:id="@+id/action_view_bugs"
-        app:showAsAction="never"
-        android:title="@string/action_view_bugs" />
+        app:actionViewClass="androidx.appcompat.widget.SearchView"
+        tools:ignore="AlwaysShowAction" />
+
+        <item
+            android:id="@+id/sort"
+            android:icon="@drawable/ic_sort"
+            android:title="@string/action_sort"
+            app:showAsAction="always" />
 </menu>

@@ -7,6 +7,7 @@ import android.content.pm.PackageManager.NameNotFoundException;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.BaseAdapter;
 import android.widget.BaseExpandableListAdapter;
 import android.widget.ExpandableListView;
 import android.widget.Filter;
@@ -15,11 +16,14 @@ import android.widget.ImageButton;
 import android.widget.ImageView;
 import android.widget.TextView;
 
+import androidx.annotation.NonNull;
+import androidx.recyclerview.widget.RecyclerView;
+
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 
-public class AllTasksListAdapter extends BaseExpandableListAdapter implements Filterable {
+public class AllTasksListAdapter extends RecyclerView.Adapter<AllTasksListAdapter.ViewHolder> implements Filterable {
     private final PackageManager pm;
     private final LayoutInflater inflater;
     private List<MyPackageInfo> packages;
@@ -83,16 +87,7 @@ public class AllTasksListAdapter extends BaseExpandableListAdapter implements Fi
         return result;
     }
 
-    @Override
-    public Object getChild(int groupPosition, int childPosition) {
-        return this.filtered.get(groupPosition).children.get(childPosition).child;
-    }
-
-    @Override
-    public long getChildId(int groupPosition, int childPosition) {
-        return this.filtered.get(groupPosition).children.get(childPosition).id;
-    }
-
+/*
     @Override
     public View getChildView(int groupPosition, int childPosition, boolean isLastChild, View convertView, ViewGroup parent) {
         MyActivityInfo activity = (MyActivityInfo) getChild(groupPosition, childPosition);
@@ -122,59 +117,38 @@ public class AllTasksListAdapter extends BaseExpandableListAdapter implements Fi
 
         return view;
     }
+*/
 
     @Override
-    public int getChildrenCount(int groupPosition) {
-        return this.filtered.get(groupPosition).children.size();
-    }
-
-    @Override
-    public Object getGroup(int groupPosition) {
-        return this.filtered.get(groupPosition).parent;
-    }
-
-    @Override
-    public int getGroupCount() {
-        return this.filtered.size();
-    }
-
-    @Override
-    public long getGroupId(int groupPosition) {
-        return this.filtered.get(groupPosition).id;
-    }
-
-    @Override
-    public View getGroupView(int groupPosition, boolean isExpanded, View convertView, ViewGroup parent) {
-        MyPackageInfo pack = (MyPackageInfo) getGroup(groupPosition);
+    public AllTasksListAdapter.ViewHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
         View view = this.inflater.inflate(R.layout.all_activities_group_item, parent, false);
+        ViewHolder viewHolder = new ViewHolder(view);
 
-        TextView text = view.findViewById(android.R.id.text1);
-        text.setText(pack.getName());
-
-        ImageView icon = view.findViewById(android.R.id.icon);
-        icon.setImageDrawable(pack.getIcon());
-
-        ImageButton button = view.findViewById(android.R.id.button1);
-        button.setOnClickListener(view1 -> view.performLongClick());
-
-        // expand if filtered list is short enough
-        if (filtered.size() < 10) {
-            ExpandableListView expandableListView = (ExpandableListView) parent;
-            expandableListView.expandGroup(groupPosition);
-        }
-
-        return view;
+        return viewHolder;
     }
 
     @Override
-    public boolean hasStableIds() {
-        return false;
+    public void onBindViewHolder(@NonNull AllTasksListAdapter.ViewHolder holder, int position) {
+        MyPackageInfo pack = (MyPackageInfo) packages.get(position);
+        holder.name.setText(pack.getName());
+        holder.packageName.setText(pack.getPackageName());
+        holder.packageVersion.setText(pack.getPackageVersion());
+        holder.packageAbi.setText("Target API " + pack.getApi());
+        holder.icon.setImageDrawable(pack.getIcon());
+
     }
 
     @Override
-    public boolean isChildSelectable(int groupPosition, int childPosition) {
-        return true;
+    public long getItemId(int i) {
+        return this.filtered.get(i).id;
     }
+
+    @Override
+    public int getItemCount() {
+        return filtered.size();
+    }
+
+
 
     @Override
     public Filter getFilter() {
@@ -221,5 +195,23 @@ public class AllTasksListAdapter extends BaseExpandableListAdapter implements Fi
             MyActivityInfo child;
             long id;
         }
+    }
+    public static class ViewHolder extends RecyclerView.ViewHolder {
+        private ImageView icon;
+        private TextView name;
+        private TextView packageName;
+        private TextView packageVersion;
+        private TextView packageAbi;
+
+        public ViewHolder(View v) {
+            super(v);
+            icon = (ImageView) v.findViewById(android.R.id.icon);
+            name = (TextView) v.findViewById(android.R.id.text1);
+            packageName = (TextView) v.findViewById(R.id.package_name);
+            packageVersion = (TextView) v.findViewById(R.id.package_version);
+            packageAbi = (TextView) v.findViewById(R.id.package_abi);
+
+        }
+
     }
 }

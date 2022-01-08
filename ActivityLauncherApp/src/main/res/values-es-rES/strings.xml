@@ -38,4 +38,8 @@
     <string name="action_view_bugs">Informa de un problema</string>
     <string name="action_filter">Filtrar...</string>
     <string name="filter_hint">paquete/acción</string>
+    <string name="settings">Settings</string>
+    <string name="recents">Recents</string>
+    <string name="apps">Apps</string>
+    <string name="action_sort">Sort</string>
 </resources>

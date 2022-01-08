@@ -3,19 +3,37 @@ package de.szalkowski.activitylauncher;
 import android.app.ProgressDialog;
 import android.content.Context;
 import android.os.AsyncTask;
+import android.widget.LinearLayout;
+import android.widget.ProgressBar;
+
+import androidx.appcompat.app.AlertDialog;
+
+import com.google.android.material.dialog.MaterialAlertDialogBuilder;
 
 public abstract class AsyncProvider<ReturnType> extends AsyncTask<Void, Integer, ReturnType> {
     private final CharSequence message;
     private final Listener<ReturnType> listener;
     private int max;
-    private final ProgressDialog progress;
+    private MaterialAlertDialogBuilder dialog;
+    private final ProgressBar progress;
+    AlertDialog progressDialog;
 
     AsyncProvider(Context context, Listener<ReturnType> listener, boolean showProgressDialog) {
         this.message = context.getText(R.string.dialog_progress_loading);
         this.listener = listener;
 
         if (showProgressDialog) {
-            this.progress = new ProgressDialog(context);
+            this.dialog = new MaterialAlertDialogBuilder(context);
+            this.dialog.setTitle(this.message)
+                    .setMessage(R.string.title_dialog_disclaimer);
+
+            progress = new ProgressBar(context, null, android.R.attr.progressBarStyleHorizontal);
+            LinearLayout.LayoutParams lp = new LinearLayout.LayoutParams(
+                    LinearLayout.LayoutParams.WRAP_CONTENT,
+                    LinearLayout.LayoutParams.WRAP_CONTENT);
+            progress.setLayoutParams(lp);
+            dialog.setView(progress);
+
         } else {
             progress = null;
         }
@@ -30,7 +48,7 @@ public abstract class AsyncProvider<ReturnType> extends AsyncTask<Void, Integer,
                 this.progress.setIndeterminate(false);
                 this.progress.setMax(this.max);
             }
-
+            this.progressDialog.setMessage(String.valueOf(value) + "/" + String.valueOf(max));
             this.progress.setProgress(value);
         }
     }
@@ -40,11 +58,14 @@ public abstract class AsyncProvider<ReturnType> extends AsyncTask<Void, Integer,
         super.onPreExecute();
 
         if (this.progress != null) {
-            this.progress.setCancelable(false);
-            this.progress.setMessage(this.message);
+
+            this.dialog.setCancelable(false);
+            //this.progress.setMessage(this.message);
             this.progress.setIndeterminate(true);
-            this.progress.setProgressStyle(ProgressDialog.STYLE_HORIZONTAL);
-            this.progress.show();
+            //this.progress.setProgressStyle(ProgressDialog.STYLE_HORIZONTAL);
+
+            progressDialog = dialog.create();
+            progressDialog.show();
         }
     }
 
@@ -57,7 +78,7 @@ public abstract class AsyncProvider<ReturnType> extends AsyncTask<Void, Integer,
 
         if (this.progress != null) {
             try {
-                this.progress.dismiss();
+                this.progressDialog.dismiss();
             } catch (IllegalArgumentException e) { /* ignore */ }
         }
     }

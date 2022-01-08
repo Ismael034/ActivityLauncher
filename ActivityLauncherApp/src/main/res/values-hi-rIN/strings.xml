@@ -38,4 +38,8 @@
     <string name="action_view_bugs">दिक्कत बताएं</string>
     <string name="action_filter">खुद के हिसाब से देखें</string>
     <string name="filter_hint">पैकेज/गतिविधि</string>
+    <string name="settings">Settings</string>
+    <string name="recents">Recents</string>
+    <string name="apps">Apps</string>
+    <string name="action_sort">Sort</string>
 </resources>

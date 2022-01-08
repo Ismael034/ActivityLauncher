@@ -4,6 +4,7 @@ import android.content.ComponentName;
 import android.content.pm.ActivityInfo;
 import android.content.pm.ApplicationInfo;
 import android.content.pm.PackageInfo;
+import android.content.pm.PackageManager;
 import android.graphics.drawable.Drawable;
 
 import java.util.Arrays;
@@ -14,6 +15,9 @@ public class MyPackageInfo implements Comparable<MyPackageInfo> {
     protected int icon_resource;
     protected String icon_resource_name;
     protected String name;
+    protected String package_version;
+    protected Integer package_api;
+
     protected MyActivityInfo[] activities;
 
     public static MyPackageInfo fromPackageInfo(PackageManagerCache cache, PackageInfo info) {
@@ -25,6 +29,16 @@ public class MyPackageInfo implements Comparable<MyPackageInfo> {
 
         if (app != null) {
             myInfo.name = pm.getApplicationLabel(app).toString();
+            try {
+                myInfo.package_version = pm.getPackageInfo(myInfo.package_name, 0).versionName;
+            } catch (PackageManager.NameNotFoundException e) {
+                e.printStackTrace();
+            }
+            try {
+                myInfo.package_api = pm.getApplicationInfo(myInfo.package_name, 0).targetSdkVersion;
+            } catch (PackageManager.NameNotFoundException e) {
+                e.printStackTrace();
+            }
             try {
                 myInfo.icon = pm.getApplicationIcon(app);
             } catch (Exception e) {
@@ -96,7 +110,12 @@ public class MyPackageInfo implements Comparable<MyPackageInfo> {
     public String getName() {
         return name;
     }
-
+    public String getPackageVersion() {
+        return package_version;
+    }
+    public String getApi() {
+        return String.valueOf(package_api);
+    }
     public String getIconResourceName() {
         return icon_resource_name;
     }

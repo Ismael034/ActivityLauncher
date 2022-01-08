@@ -10,42 +10,52 @@ import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.ExpandableListAdapter;
-import android.widget.ExpandableListView;
-import android.widget.ExpandableListView.ExpandableListContextMenuInfo;
+import android.widget.AdapterView;
 import android.widget.Filter;
 import android.widget.Filterable;
+import android.widget.ListView;
+import android.widget.ProgressBar;
 import android.widget.Toast;
 
 import androidx.annotation.NonNull;
 import androidx.fragment.app.DialogFragment;
 import androidx.fragment.app.Fragment;
+import androidx.recyclerview.widget.LinearLayoutManager;
+import androidx.recyclerview.widget.RecyclerView;
+
+import com.google.android.material.color.DynamicColors;
 
 import org.thirdparty.LauncherIconCreator;
 
 import java.util.Objects;
 
 public class AllTasksListFragment extends Fragment implements AllTasksListAsyncProvider.Listener<AllTasksListAdapter>, Filterable {
-    private ExpandableListView list;
+    private RecyclerView reyclerViewTasks;
 
     @Override
     public View onCreateView(@NonNull LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
         View view = inflater.inflate(R.layout.fragment_all_list, container, false);
+        reyclerViewTasks = (RecyclerView) view.findViewById(R.id.reyclerViewTasks);
+        reyclerViewTasks.setLayoutManager(new LinearLayoutManager(view.getContext()));
+        reyclerViewTasks.setHasFixedSize(true);
+        // specify an adapter with the list to show
+        /*
+        this.reyclerViewTasks.setOnItemClickListener(new AdapterView.OnItemClickListener() {
+            @Override
+            public void onItemClick(AdapterView<?> adapterView, View view, int i, long l) {
 
-        this.list = view.findViewById(R.id.expandableListView1);
-        this.list.setOnChildClickListener(
-                (parent, v, groupPosition, childPosition, id) -> {
                     ExpandableListAdapter adapter = parent.getExpandableListAdapter();
                     MyActivityInfo info = (MyActivityInfo) adapter.getChild(groupPosition, childPosition);
                     var rooted = isRootAllowed();
                     LauncherIconCreator.launchActivity(getActivity(), info.component_name, rooted && info.is_private);
                     return false;
-                }
-        );
-        this.list.setTextFilterEnabled(true);
-        registerForContextMenu(this.list);
 
+            }
+        });
+      */
+        //this.reyclerViewTasks.setTextFilterEnabled(true);
+        registerForContextMenu(this.reyclerViewTasks);
         AllTasksListAsyncProvider provider = new AllTasksListAsyncProvider(getActivity(), this);
         provider.execute();
 
@@ -65,84 +75,15 @@ public class AllTasksListFragment extends Fragment implements AllTasksListAsyncP
         if (rooted) {
             menu.add(Menu.NONE, 3, Menu.NONE, R.string.context_action_launch_as_root);
         }
-        ExpandableListContextMenuInfo info = (ExpandableListContextMenuInfo) menuInfo;
-        ExpandableListView list = requireView().findViewById(R.id.expandableListView1);
-
-        switch (ExpandableListView.getPackedPositionType(info.packedPosition)) {
-            case ExpandableListView.PACKED_POSITION_TYPE_CHILD:
-                MyActivityInfo activity = (MyActivityInfo) list.getExpandableListAdapter().getChild(ExpandableListView.getPackedPositionGroup(info.packedPosition), ExpandableListView.getPackedPositionChild(info.packedPosition));
-                menu.setHeaderIcon(activity.icon);
-                menu.setHeaderTitle(activity.name);
-                menu.add(Menu.NONE, 4, Menu.NONE, R.string.context_action_edit);
-                break;
-            case ExpandableListView.PACKED_POSITION_TYPE_GROUP:
-                MyPackageInfo pack = (MyPackageInfo) list.getExpandableListAdapter().getGroup(ExpandableListView.getPackedPositionGroup(info.packedPosition));
-                menu.setHeaderIcon(pack.icon);
-                menu.setHeaderTitle(pack.name);
-                break;
-        }
-
         super.onCreateContextMenu(menu, v, menuInfo);
     }
 
-    @Override
-    public boolean onContextItemSelected(MenuItem item) {
-        ExpandableListContextMenuInfo info = (ExpandableListContextMenuInfo) item.getMenuInfo();
-        ExpandableListView list = requireView().findViewById(R.id.expandableListView1);
-
-        switch (ExpandableListView.getPackedPositionType(info.packedPosition)) {
-            case ExpandableListView.PACKED_POSITION_TYPE_CHILD:
-                MyActivityInfo activity = (MyActivityInfo) list.getExpandableListAdapter().getChild(ExpandableListView.getPackedPositionGroup(info.packedPosition), ExpandableListView.getPackedPositionChild(info.packedPosition));
-                switch (item.getItemId()) {
-                    case 0:
-                        LauncherIconCreator.createLauncherIcon(getActivity(), activity);
-                        break;
-                    case 1:
-                        RootLauncherIconCreator.createLauncherIcon(getActivity(), activity);
-                        break;
-                    case 2:
-                        LauncherIconCreator.launchActivity(getActivity(), activity.component_name, false);
-                        break;
-                    case 3:
-                        LauncherIconCreator.launchActivity(getActivity(), activity.component_name, true);
-                        break;
-                    case 4:
-                        DialogFragment dialog = new ShortcutEditDialogFragment();
-                        Bundle args = new Bundle();
-                        args.putParcelable("activity", activity.component_name);
-                        args.putBoolean("as_root", activity.is_private);
-                        dialog.setArguments(args);
-                        dialog.show(getChildFragmentManager(), "ShortcutEditor");
-                        break;
-                }
-                break;
-
-            case ExpandableListView.PACKED_POSITION_TYPE_GROUP:
-                MyPackageInfo pack = (MyPackageInfo) list.getExpandableListAdapter().getGroup(ExpandableListView.getPackedPositionGroup(info.packedPosition));
-                switch (item.getItemId()) {
-                    case 0:
-                        LauncherIconCreator.createLauncherIcon(requireActivity(), pack);
-                        Toast.makeText(getActivity(), getString(R.string.error_no_default_activity), Toast.LENGTH_LONG).show();
-                        break;
-                    case 1:
-                        PackageManager pm = requireActivity().getPackageManager();
-                        Intent intent = pm.getLaunchIntentForPackage(pack.package_name);
-                        if (intent != null) {
-                            Toast.makeText(getActivity(), String.format(getText(R.string.starting_application).toString(), pack.name), Toast.LENGTH_LONG).show();
-                            requireActivity().startActivity(intent);
-                        } else {
-                            Toast.makeText(getActivity(), getString(R.string.error_no_default_activity), Toast.LENGTH_LONG).show();
-                        }
-                        break;
-                }
-        }
-        return super.onContextItemSelected(item);
-    }
 
     @Override
     public void onProviderFinished(AsyncProvider<AllTasksListAdapter> task, AllTasksListAdapter value) {
+
         try {
-            this.list.setAdapter(value);
+            this.reyclerViewTasks.setAdapter(value);
         } catch (Exception e) {
             Toast.makeText(getActivity(), R.string.error_tasks, Toast.LENGTH_SHORT).show();
         }
@@ -150,7 +91,8 @@ public class AllTasksListFragment extends Fragment implements AllTasksListAsyncP
 
     @Override
     public Filter getFilter() {
-        AllTasksListAdapter adapter = (AllTasksListAdapter) this.list.getExpandableListAdapter();
+        AllTasksListAdapter adapter = (AllTasksListAdapter) this.reyclerViewTasks.getAdapter();
+
         if (adapter != null) {
             return adapter.getFilter();
         } else {

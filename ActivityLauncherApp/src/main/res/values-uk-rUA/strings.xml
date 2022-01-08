@@ -38,4 +38,8 @@
     <string name="action_view_bugs">Повідомити про проблему</string>
     <string name="action_filter">Фільтр...</string>
     <string name="filter_hint">пакет/дія</string>
+    <string name="settings">Settings</string>
+    <string name="recents">Recents</string>
+    <string name="apps">Apps</string>
+    <string name="action_sort">Sort</string>
 </resources>
