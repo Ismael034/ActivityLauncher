@@ -78,6 +78,59 @@ public class AllTasksListFragment extends Fragment implements AllTasksListAsyncP
         super.onCreateContextMenu(menu, v, menuInfo);
     }
 
+    @Override
+    public boolean onContextItemSelected(MenuItem item) {
+        ExpandableListContextMenuInfo info = (ExpandableListContextMenuInfo) item.getMenuInfo();
+        ExpandableListView list = requireView().findViewById(R.id.expandableListView1);
+
+        switch (ExpandableListView.getPackedPositionType(info.packedPosition)) {
+            case ExpandableListView.PACKED_POSITION_TYPE_CHILD:
+                MyActivityInfo activity = (MyActivityInfo) list.getExpandableListAdapter().getChild(ExpandableListView.getPackedPositionGroup(info.packedPosition), ExpandableListView.getPackedPositionChild(info.packedPosition));
+                switch (item.getItemId()) {
+                    case 0:
+                        LauncherIconCreator.createLauncherIcon(getActivity(), activity);
+                        break;
+                    case 1:
+                        RootLauncherIconCreator.createLauncherIcon(getActivity(), activity);
+                        break;
+                    case 2:
+                        LauncherIconCreator.launchActivity(getActivity(), activity.component_name, false);
+                        break;
+                    case 3:
+                        LauncherIconCreator.launchActivity(getActivity(), activity.component_name, true);
+                        break;
+                    case 4:
+                        DialogFragment dialog = new ShortcutEditDialogFragment();
+                        Bundle args = new Bundle();
+                        args.putParcelable("activity", activity.component_name);
+                        args.putBoolean("as_root", activity.is_private);
+                        dialog.setArguments(args);
+                        dialog.show(getChildFragmentManager(), "ShortcutEditor");
+                        break;
+                }
+                break;
+
+            case ExpandableListView.PACKED_POSITION_TYPE_GROUP:
+                MyPackageInfo pack = (MyPackageInfo) list.getExpandableListAdapter().getGroup(ExpandableListView.getPackedPositionGroup(info.packedPosition));
+                switch (item.getItemId()) {
+                    case 0:
+                        LauncherIconCreator.createLauncherIcon(requireActivity(), pack);
+                        Toast.makeText(getActivity(), getString(R.string.error_no_default_activity), Toast.LENGTH_LONG).show();
+                        break;
+                    case 2:
+                        PackageManager pm = requireActivity().getPackageManager();
+                        Intent intent = pm.getLaunchIntentForPackage(pack.package_name);
+                        if (intent != null) {
+                            Toast.makeText(getActivity(), String.format(getText(R.string.starting_application).toString(), pack.name), Toast.LENGTH_LONG).show();
+                            requireActivity().startActivity(intent);
+                        } else {
+                            Toast.makeText(getActivity(), getString(R.string.error_no_default_activity), Toast.LENGTH_LONG).show();
+                        }
+                        break;
+                }
+        }
+        return super.onContextItemSelected(item);
+    }
 
     @Override
     public void onProviderFinished(AsyncProvider<AllTasksListAdapter> task, AllTasksListAdapter value) {
