@@ -100,11 +100,6 @@ public class AllTasksListAdapter extends RecyclerView.Adapter<AllTasksListAdapte
         text2.setText(activity.getComponentName().getClassName());
 
         if (activity.is_private) {
-            text1.setEnabled(false);
-            text1.setAlpha(0.5f);
-            text2.setEnabled(false);
-            text2.setAlpha(0.5f);
-
             ImageView icon1 = view.findViewById(android.R.id.icon1);
             icon1.setVisibility(View.VISIBLE);
         }

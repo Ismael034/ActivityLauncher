@@ -19,18 +19,8 @@ jobs:
       run: ./gradlew androidDependencies
     - name: Build debug
       run: ./gradlew assembleDebug
-    - name: Upload APK
-      uses: actions/upload-artifact@v1
+    - name: Upload debug APK
+      uses: actions/upload-artifact@v2
       with:
-        name: apk
+        name: debug.apk
         path: ActivityLauncherApp/build/outputs/apk/debug/ActivityLauncherApp-debug.apk
-  
-  deploy:
-    needs: build
-    runs-on: ubuntu-latest
-    steps:
-    - name: 'Download artifact'
-      uses: actions/download-artifact@v2
-      with:
-        name: apk
-        path: ${{ runner.temp }}
